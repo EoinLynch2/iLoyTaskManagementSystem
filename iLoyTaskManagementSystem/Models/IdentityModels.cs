@@ -21,7 +21,7 @@ namespace iLoyTaskManagementSystem.Models
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public DbSet<TmsTask> TmsTasks { get; set; }
+        public DbSet<TmsTask> TmsTask { get; set; }
 
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
