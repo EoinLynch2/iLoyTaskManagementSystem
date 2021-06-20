@@ -16,8 +16,9 @@ namespace iLoyTaskManagementSystem.Models
         public string  Description { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset FinishDate { get; set; }
-        [Required]
-        public State State { get; set; }
-        public virtual TmsTask ParentTmsTask { get; set; }
+        public string State { get; set; }
+
+
+        public virtual int? ParentTmsTaskId { get; set; }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using iLoyTaskManagementSystem.Models;
-using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
-using System.Web;
 using System.Web.Http;
 
 namespace iLoyTaskManagementSystem.Controllers
@@ -24,34 +22,93 @@ namespace iLoyTaskManagementSystem.Controllers
             _context.Dispose();
         }
 
-        [Route("TmsTask/{taskName}")]
-        public string Get(string TaskName)
+        [Route("TmsTask/"), HttpGetAttribute]
+        public IEnumerable<TmsTask> Get()
         {
-            return TaskName;
+            return _context.TmsTask;
         }
 
-        [Route("TmsTask/Add"), HttpPost]
-        public IHttpActionResult Post([FromBody]TmsTask  tmsTask/*, string State*/)
+        [Route("TmsTask/{id}"), HttpGetAttribute]
+        public TmsTask Get(int id)
         {
-            if (StateExists(tmsTask.State.StateName) == false)
-                return BadRequest("The state does not exist");
+            var TmsTask = _context.TmsTask.Find(id);
+            return TmsTask;
+        }
 
-            _context.TmsTask.Add(tmsTask);
-            _context.SaveChanges();
-            string name = tmsTask.TaskName;
+        [Route("TmsTask/Add/{parentTaskId?}"), HttpPost]
+        public IHttpActionResult Post([FromBody]TmsTask  tmsTask, int? parentTaskId = null)
+        {
+            if (tmsTask.State == null)
+                return BadRequest("The state must exist");
+
+            if(parentTaskId != null)
+                if (IsTaskExists(parentTaskId))
+                    tmsTask.ParentTmsTaskId = (int)parentTaskId;
+                else
+                    return BadRequest("The specified parent task does not exist");
+
+            try
+            {
+                _context.Set<TmsTask>().Add(tmsTask);
+                _context.SaveChanges();
+            }
+            catch (DbUpdateException updateException)
+            {
+                //Log exception //Don't give detailed error message in production...
+                return BadRequest("Update Exception: " + updateException.ToString());
+            }
             return Ok();
         }
 
-        private bool StateExists(string stateName)
+        [Route("TmsTask/Update/{id}"), HttpPut]
+        public IHttpActionResult Update(int id, [FromBody]TmsTask tmsTask)
         {
-            bool stateExists = false;
-            if (_context.State.Any(o => o.StateName == stateName))
+            var entity = _context.TmsTask.FirstOrDefault(t => t.TmsTaskId == id);
+            entity.TaskName = tmsTask.TaskName;
+            entity.Description = tmsTask.Description;
+            entity.StartDate = tmsTask.StartDate;
+            entity.FinishDate = tmsTask.FinishDate;
+            entity.State = tmsTask.State;
+            _context.SaveChanges();
+            return Ok();
+        }
+
+        public void UpdateParentTaskStatus(int ParentTaskId)
+        {
+            string parentTaskState = "Planned";
+
+            int totalSubtasks = _context.TmsTask
+                .Where(t => t.ParentTmsTaskId == ParentTaskId)
+                .Count();
+
+            int totalCompletedSubtasks = _context.TmsTask
+                .Where(t => t.ParentTmsTaskId == ParentTaskId && t.State == "Completed").Count();
+
+            if (totalCompletedSubtasks == totalSubtasks)
             {
-                stateExists = true;
+                parentTaskState = "Completed";
             }
             else
-                stateExists = false;
-            return stateExists;
+            {
+                var InProgressSubtasks = _context.TmsTask
+                    .Where(t => t.ParentTmsTaskId == ParentTaskId && t.State == "InProgress").ToList();
+                parentTaskState = "InProgress";
+            }
+
+            TmsTask parentTmsTask = _context.TmsTask.Find(ParentTaskId);
+            parentTmsTask.State = parentTaskState;
+            _context.SaveChanges();
+
+        }
+
+
+
+        public bool IsTaskExists(int? taskId)
+        {
+            bool isTaskExists = false;
+            if (_context.TmsTask.Any(t => t.TmsTaskId == taskId))
+                isTaskExists = true;
+            return isTaskExists;
         }
 
     }

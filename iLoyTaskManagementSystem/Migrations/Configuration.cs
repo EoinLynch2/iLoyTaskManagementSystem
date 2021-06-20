@@ -1,5 +1,6 @@
 namespace iLoyTaskManagementSystem.Migrations
 {
+    using iLoyTaskManagementSystem.Models;
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
@@ -14,6 +15,7 @@ namespace iLoyTaskManagementSystem.Migrations
 
         protected override void Seed(iLoyTaskManagementSystem.Models.ApplicationDbContext context)
         {
+         
             //  This method will be called after migrating to the latest version.
 
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
