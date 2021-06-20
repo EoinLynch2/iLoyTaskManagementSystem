@@ -30,14 +30,28 @@ namespace iLoyTaskManagementSystem.Controllers
             return TaskName;
         }
 
-        [Route("TmsTask/Add")]
-        public string Post([FromBody]TmsTask  tmsTask)
+        [Route("TmsTask/Add"), HttpPost]
+        public IHttpActionResult Post([FromBody]TmsTask  tmsTask/*, string State*/)
         {
+            if (StateExists(tmsTask.State.StateName) == false)
+                return BadRequest("The state does not exist");
+
             _context.TmsTask.Add(tmsTask);
             _context.SaveChanges();
-            string name = tmsTask.Name;
-            return "MyTaskName: " +  name;
+            string name = tmsTask.TaskName;
+            return Ok();
+        }
 
+        private bool StateExists(string stateName)
+        {
+            bool stateExists = false;
+            if (_context.State.Any(o => o.StateName == stateName))
+            {
+                stateExists = true;
+            }
+            else
+                stateExists = false;
+            return stateExists;
         }
 
     }

@@ -216,10 +216,23 @@
     <Compile Include="Migrations\202106192128001_Initial-Model.Designer.cs">
       <DependentUpon>202106192128001_Initial-Model.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202106201319392_MadeTaskNameUnique.cs" />
+    <Compile Include="Migrations\202106201319392_MadeTaskNameUnique.Designer.cs">
+      <DependentUpon>202106201319392_MadeTaskNameUnique.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202106201331280_AddedModelForState.cs" />
+    <Compile Include="Migrations\202106201331280_AddedModelForState.Designer.cs">
+      <DependentUpon>202106201331280_AddedModelForState.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202106201404348_ClarifiedNamesOfTaskAndState.cs" />
+    <Compile Include="Migrations\202106201404348_ClarifiedNamesOfTaskAndState.Designer.cs">
+      <DependentUpon>202106201404348_ClarifiedNamesOfTaskAndState.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\State.cs" />
     <Compile Include="Models\TmsTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
@@ -317,6 +330,15 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202106192128001_Initial-Model.resx">
       <DependentUpon>202106192128001_Initial-Model.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106201319392_MadeTaskNameUnique.resx">
+      <DependentUpon>202106201319392_MadeTaskNameUnique.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106201331280_AddedModelForState.resx">
+      <DependentUpon>202106201331280_AddedModelForState.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106201404348_ClarifiedNamesOfTaskAndState.resx">
+      <DependentUpon>202106201404348_ClarifiedNamesOfTaskAndState.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
