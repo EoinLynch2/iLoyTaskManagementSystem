@@ -1,8 +1,16 @@
 ﻿using iLoyTaskManagementSystem.Models;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web.Http;
+
 
 namespace iLoyTaskManagementSystem.Controllers
 {
@@ -35,22 +43,40 @@ namespace iLoyTaskManagementSystem.Controllers
             return TmsTask;
         }
 
-        [Route("TmsTask/Add/{parentTaskId?}"), HttpPost]
-        public IHttpActionResult Post([FromBody]TmsTask  tmsTask, int? parentTaskId = null)
+        [Route("TmsTask/Delete/{id}"), HttpDelete]
+        public IHttpActionResult Delete(int id)
+        {
+            var tmsTask = _context.TmsTask.Find(id);
+            _context.TmsTask.Remove(tmsTask);
+            _context.SaveChanges();
+            return Ok();
+        }
+
+        [Route("TmsTask/Add/{parentTaskId?}"), HttpPost] //if parent taskId is specified, the TmsTask object will be a subtask assigned to the parentTask of associated id
+        public IHttpActionResult Post([FromBody] TmsTask tmsTask, int? parentTaskId = null)
         {
             if (tmsTask.State == null)
                 return BadRequest("The state must exist");
 
-            if(parentTaskId != null)
-                if (IsTaskExists(parentTaskId))
+            bool isParentTaskExists = false;
+            if (parentTaskId != null)
+            {
+                isParentTaskExists = IsTaskExists(parentTaskId);
+
+                if (isParentTaskExists)
                     tmsTask.ParentTmsTaskId = (int)parentTaskId;
                 else
                     return BadRequest("The specified parent task does not exist");
+            }
 
             try
             {
                 _context.Set<TmsTask>().Add(tmsTask);
                 _context.SaveChanges();
+                if (isParentTaskExists)
+                {
+                    UpdateParentTaskStatus((int)parentTaskId);
+                }
             }
             catch (DbUpdateException updateException)
             {
@@ -61,7 +87,7 @@ namespace iLoyTaskManagementSystem.Controllers
         }
 
         [Route("TmsTask/Update/{id}"), HttpPut]
-        public IHttpActionResult Update(int id, [FromBody]TmsTask tmsTask)
+        public IHttpActionResult Update(int id, [FromBody] TmsTask tmsTask)
         {
             var entity = _context.TmsTask.FirstOrDefault(t => t.TmsTaskId == id);
             entity.TaskName = tmsTask.TaskName;
@@ -70,7 +96,45 @@ namespace iLoyTaskManagementSystem.Controllers
             entity.FinishDate = tmsTask.FinishDate;
             entity.State = tmsTask.State;
             _context.SaveChanges();
+
+            if (entity.ParentTmsTaskId > 0)
+                UpdateParentTaskStatus((int)entity.ParentTmsTaskId);
+            else
+            {
+                int numOfSubtasksOfThisTask = _context.TmsTask
+                    .Where(t => t.ParentTmsTaskId == id).Count();
+                if (numOfSubtasksOfThisTask > 0)
+                    //If a parents task status is manually overridden, we will call update the task status to ensure correctness.
+                    UpdateParentTaskStatus(id);
+            }
+
+
             return Ok();
+        }
+
+        [Route("GetInProgressTasks/")]
+        public HttpResponseMessage GetInprogressTasksForDate(/*DateTimeOffset date*/)
+        {
+            MemoryStream stream = new MemoryStream();
+            StreamWriter writer = new StreamWriter(stream);
+            List<TmsTask> taskList =  _context.TmsTask
+                    /*.Where(t => t.State == "InProgress")*/.ToList();
+            //List<String> myTestList = new List<string> { "This", "Is", "Test" };
+            string csv = string.Join(",", taskList.Select(n => n.ToString().ToString()).ToArray());
+            foreach (TmsTask tmsTask in taskList)
+            {
+                tmsTask.ToString();
+            }
+            writer.Write(csv);
+            writer.Flush();
+            stream.Position = 0;
+
+            HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
+            result.Content = new StreamContent(stream);
+            result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+            result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "Export.csv" };
+            return result;
+
         }
 
         public void UpdateParentTaskStatus(int ParentTaskId)
@@ -90,18 +154,16 @@ namespace iLoyTaskManagementSystem.Controllers
             }
             else
             {
-                var InProgressSubtasks = _context.TmsTask
-                    .Where(t => t.ParentTmsTaskId == ParentTaskId && t.State == "InProgress").ToList();
-                parentTaskState = "InProgress";
+                int totalInProgressSubtasks = _context.TmsTask
+                    .Where(t => t.ParentTmsTaskId == ParentTaskId && t.State == "InProgress").Count();
+                if(totalInProgressSubtasks > 0)
+                    parentTaskState = "InProgress";
             }
 
             TmsTask parentTmsTask = _context.TmsTask.Find(ParentTaskId);
             parentTmsTask.State = parentTaskState;
             _context.SaveChanges();
-
         }
-
-
 
         public bool IsTaskExists(int? taskId)
         {
