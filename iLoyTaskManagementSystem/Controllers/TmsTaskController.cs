@@ -117,14 +117,20 @@ namespace iLoyTaskManagementSystem.Controllers
         {
             MemoryStream stream = new MemoryStream();
             StreamWriter writer = new StreamWriter(stream);
-            List<TmsTask> taskList =  _context.TmsTask
-                    /*.Where(t => t.State == "InProgress")*/.ToList();
+            var taskList = _context.TmsTask;
+            ///*.Where(t => t.State == "InProgress")*/.ToList();
             //List<String> myTestList = new List<string> { "This", "Is", "Test" };
-            string csv = string.Join(",", taskList.Select(n => n.ToString().ToString()).ToArray());
-            foreach (TmsTask tmsTask in taskList)
+            string csv = "";
+            foreach(TmsTask tmsTask in taskList)
             {
-                tmsTask.ToString();
+                csv += "TaskName:" + tmsTask.TaskName + ",";
+                csv += "Description:" + tmsTask.Description + ",";
+                csv += "StartDate:" + tmsTask.StartDate + ",";
+                csv += "FinishDate:" + tmsTask.FinishDate + ",";
+                csv += "State:" + tmsTask.State + ",";
             }
+
+
             writer.Write(csv);
             writer.Flush();
             stream.Position = 0;
