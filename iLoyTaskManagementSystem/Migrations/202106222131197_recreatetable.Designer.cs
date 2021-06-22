@@ -7,13 +7,13 @@ namespace iLoyTaskManagementSystem.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class MadeTaskNameUnique : IMigrationMetadata
+    public sealed partial class recreatetable : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(MadeTaskNameUnique));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(recreatetable));
         
         string IMigrationMetadata.Id
         {
-            get { return "202106201319392_MadeTaskNameUnique"; }
+            get { return "202106222131197_recreatetable"; }
         }
         
         string IMigrationMetadata.Source

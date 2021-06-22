@@ -34,6 +34,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>App_Data/XmlDocument.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,10 +46,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Castle.Core.4.4.0\lib\net45\Castle.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Moq, Version=4.16.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.16.1\lib\net45\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -210,65 +223,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202106192128001_Initial-Model.cs" />
-    <Compile Include="Migrations\202106192128001_Initial-Model.Designer.cs">
-      <DependentUpon>202106192128001_Initial-Model.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202106201319392_MadeTaskNameUnique.cs" />
-    <Compile Include="Migrations\202106201319392_MadeTaskNameUnique.Designer.cs">
-      <DependentUpon>202106201319392_MadeTaskNameUnique.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202106201331280_AddedModelForState.cs" />
-    <Compile Include="Migrations\202106201331280_AddedModelForState.Designer.cs">
-      <DependentUpon>202106201331280_AddedModelForState.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202106201404348_ClarifiedNamesOfTaskAndState.cs" />
-    <Compile Include="Migrations\202106201404348_ClarifiedNamesOfTaskAndState.Designer.cs">
-      <DependentUpon>202106201404348_ClarifiedNamesOfTaskAndState.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202106201517375_FixForeignKeys.cs" />
-    <Compile Include="Migrations\202106201517375_FixForeignKeys.Designer.cs">
-      <DependentUpon>202106201517375_FixForeignKeys.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202106201556367_RearrangedForeignKeys.cs" />
-    <Compile Include="Migrations\202106201556367_RearrangedForeignKeys.Designer.cs">
-      <DependentUpon>202106201556367_RearrangedForeignKeys.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202106201617381_ChangedModel.cs" />
-    <Compile Include="Migrations\202106201617381_ChangedModel.Designer.cs">
-      <DependentUpon>202106201617381_ChangedModel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202106201620371_RemovedRequiredFromState.cs" />
-    <Compile Include="Migrations\202106201620371_RemovedRequiredFromState.Designer.cs">
-      <DependentUpon>202106201620371_RemovedRequiredFromState.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202106201700413_MadeStatusEnumType.cs" />
-    <Compile Include="Migrations\202106201700413_MadeStatusEnumType.Designer.cs">
-      <DependentUpon>202106201700413_MadeStatusEnumType.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202106201716004_RevertedToObjectStyleFK.cs" />
-    <Compile Include="Migrations\202106201716004_RevertedToObjectStyleFK.Designer.cs">
-      <DependentUpon>202106201716004_RevertedToObjectStyleFK.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202106201738141_RemovedRequiredStateField.cs" />
-    <Compile Include="Migrations\202106201738141_RemovedRequiredStateField.Designer.cs">
-      <DependentUpon>202106201738141_RemovedRequiredStateField.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202106201744167_RemovedStateTable.cs" />
-    <Compile Include="Migrations\202106201744167_RemovedStateTable.Designer.cs">
-      <DependentUpon>202106201744167_RemovedStateTable.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202106201937563_AddedParentTaskForeignKey.cs" />
-    <Compile Include="Migrations\202106201937563_AddedParentTaskForeignKey.Designer.cs">
-      <DependentUpon>202106201937563_AddedParentTaskForeignKey.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202106201942479_AddedParentTaskForeignKey1.cs" />
-    <Compile Include="Migrations\202106201942479_AddedParentTaskForeignKey1.Designer.cs">
-      <DependentUpon>202106201942479_AddedParentTaskForeignKey1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202106201951387_AddedParentTaskForeignKeyAsID.cs" />
-    <Compile Include="Migrations\202106201951387_AddedParentTaskForeignKeyAsID.Designer.cs">
-      <DependentUpon>202106201951387_AddedParentTaskForeignKeyAsID.cs</DependentUpon>
+    <Compile Include="Migrations\202106222131197_recreatetable.cs" />
+    <Compile Include="Migrations\202106222131197_recreatetable.Designer.cs">
+      <DependentUpon>202106222131197_recreatetable.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -368,50 +325,8 @@
     <Content Include="Scripts\jquery-3.4.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202106192128001_Initial-Model.resx">
-      <DependentUpon>202106192128001_Initial-Model.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106201319392_MadeTaskNameUnique.resx">
-      <DependentUpon>202106201319392_MadeTaskNameUnique.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106201331280_AddedModelForState.resx">
-      <DependentUpon>202106201331280_AddedModelForState.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106201404348_ClarifiedNamesOfTaskAndState.resx">
-      <DependentUpon>202106201404348_ClarifiedNamesOfTaskAndState.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106201517375_FixForeignKeys.resx">
-      <DependentUpon>202106201517375_FixForeignKeys.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106201556367_RearrangedForeignKeys.resx">
-      <DependentUpon>202106201556367_RearrangedForeignKeys.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106201617381_ChangedModel.resx">
-      <DependentUpon>202106201617381_ChangedModel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106201620371_RemovedRequiredFromState.resx">
-      <DependentUpon>202106201620371_RemovedRequiredFromState.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106201700413_MadeStatusEnumType.resx">
-      <DependentUpon>202106201700413_MadeStatusEnumType.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106201716004_RevertedToObjectStyleFK.resx">
-      <DependentUpon>202106201716004_RevertedToObjectStyleFK.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106201738141_RemovedRequiredStateField.resx">
-      <DependentUpon>202106201738141_RemovedRequiredStateField.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106201744167_RemovedStateTable.resx">
-      <DependentUpon>202106201744167_RemovedStateTable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106201937563_AddedParentTaskForeignKey.resx">
-      <DependentUpon>202106201937563_AddedParentTaskForeignKey.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106201942479_AddedParentTaskForeignKey1.resx">
-      <DependentUpon>202106201942479_AddedParentTaskForeignKey1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106201951387_AddedParentTaskForeignKeyAsID.resx">
-      <DependentUpon>202106201951387_AddedParentTaskForeignKeyAsID.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202106222131197_recreatetable.resx">
+      <DependentUpon>202106222131197_recreatetable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

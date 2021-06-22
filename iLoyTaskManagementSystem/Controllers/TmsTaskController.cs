@@ -30,12 +30,23 @@ namespace iLoyTaskManagementSystem.Controllers
             _context.Dispose();
         }
 
+        /// <summary>
+        /// Returns all tasks in database.
+        /// </summary>
+        /// <returns></returns>
         [Route("TmsTask/"), HttpGetAttribute]
         public IEnumerable<TmsTask> Get()
         {
             return _context.TmsTask;
         }
 
+
+        /// <summary>
+        /// Returns a Task that matches a provided id. 
+        /// Returns a Bad Request(400) if no TmsTask exists for id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [Route("TmsTask/{id}"), HttpGetAttribute]
         public TmsTask Get(int id)
         {
@@ -43,15 +54,33 @@ namespace iLoyTaskManagementSystem.Controllers
             return TmsTask;
         }
 
+        /// <summary>
+        /// Deletes a task that matches a provided id. 
+        /// Returns Ok(200) status code if delete successful.
+        /// Returns a Bad Request(400) if no TmsTask exists for id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [Route("TmsTask/Delete/{id}"), HttpDelete]
         public IHttpActionResult Delete(int id)
         {
             var tmsTask = _context.TmsTask.Find(id);
+            if (tmsTask == null)
+                return BadRequest("No task found with that id");
             _context.TmsTask.Remove(tmsTask);
             _context.SaveChanges();
             return Ok();
         }
 
+
+        /// <summary>
+        /// Adds a new TmsTask. If parentID is provided, the TmsTask provided will be added as a subtask of the task associated with ParentId. 
+        /// Returns Ok(200) status code if added successfully.
+        /// Returns Bad Request(400) status code if State is not provided.
+        /// </summary>
+        /// <param name="tmsTask"></param>
+        /// <param name="parentTaskId"> </param>
+        /// <returns></returns>
         [Route("TmsTask/Add/{parentTaskId?}"), HttpPost] //if parent taskId is specified, the TmsTask object will be a subtask assigned to the parentTask of associated id
         public IHttpActionResult Post([FromBody] TmsTask tmsTask, int? parentTaskId = null)
         {
@@ -59,6 +88,7 @@ namespace iLoyTaskManagementSystem.Controllers
                 return BadRequest("The state must exist");
 
             bool isParentTaskExists = false;
+
             if (parentTaskId != null)
             {
                 isParentTaskExists = IsTaskExists(parentTaskId);
@@ -86,9 +116,25 @@ namespace iLoyTaskManagementSystem.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Updates a TmsTask based on a provided id and TmsTask data to be updated. 
+        /// Returns Ok(200) status code if update successful. 
+        /// Returns Bad Request(400) status code if no TmsTask exists for id.
+        /// </summary>
+        /// <param name="id"> the id provided</param>
+        /// <param name="tmsTask"></param>
+        /// <returns></returns>
         [Route("TmsTask/Update/{id}"), HttpPut]
         public IHttpActionResult Update(int id, [FromBody] TmsTask tmsTask)
         {
+            var lookupTask = _context.TmsTask.Find(id);
+            if (id <= 0)
+                return BadRequest();
+            else if (lookupTask == null)
+                return BadRequest("No task exists for this id");
+            //TODO: add lookup, throw error if not exist
+
+
             var entity = _context.TmsTask.FirstOrDefault(t => t.TmsTaskId == id);
             entity.TaskName = tmsTask.TaskName;
             entity.Description = tmsTask.Description;
@@ -107,19 +153,33 @@ namespace iLoyTaskManagementSystem.Controllers
                     //If a parents task status is manually overridden, we will call update the task status to ensure correctness.
                     UpdateParentTaskStatus(id);
             }
-
-
             return Ok();
         }
 
-        [Route("GetInProgressTasks/")]
-        public HttpResponseMessage GetInprogressTasksForDate(/*DateTimeOffset date*/)
+
+        /// <summary>
+        /// Returns a downloadable csv file for all InProgress TmsTasks that started before a given date.
+        /// Date parameter should in format : GetInProgressTasks?date=2021-06-21T05:04:18.070Z so timezone is not lost.
+        /// Returns Bad Request(400) if date not provided.
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        [Route("GetInProgressTasks/{date?}")]
+        public HttpResponseMessage GetInprogressTasksForDate(DateTimeOffset date)
         {
+            if (date == null)
+            {
+                HttpError err = new HttpError("A date must be provided");
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+            //Url param should be passed like: GetInProgressTasks?date=2021-06-21T05:04:18.070Z
+
             MemoryStream stream = new MemoryStream();
             StreamWriter writer = new StreamWriter(stream);
-            var taskList = _context.TmsTask;
-            ///*.Where(t => t.State == "InProgress")*/.ToList();
-            //List<String> myTestList = new List<string> { "This", "Is", "Test" };
+            var taskList = _context.TmsTask
+                .Where(t => t.StartDate <= date && t.State == "InProgress")
+                .ToList();
+        
             string csv = "";
             foreach(TmsTask tmsTask in taskList)
             {
@@ -127,7 +187,7 @@ namespace iLoyTaskManagementSystem.Controllers
                 csv += "Description:" + tmsTask.Description + ",";
                 csv += "StartDate:" + tmsTask.StartDate + ",";
                 csv += "FinishDate:" + tmsTask.FinishDate + ",";
-                csv += "State:" + tmsTask.State + ",";
+                csv += "State:" + tmsTask.State + ",\n";
             }
 
 
@@ -140,9 +200,16 @@ namespace iLoyTaskManagementSystem.Controllers
             result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
             result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "Export.csv" };
             return result;
-
         }
 
+
+        /// <summary>
+        /// Will update status of parent task id based on following rules
+        /// Completed, if all subtasks have state Completed
+        /// InProgress, if there is at least one subtask with state inProgress
+        /// Planned in all other cases.
+        /// </summary>
+        /// <param name="ParentTaskId"></param>
         public void UpdateParentTaskStatus(int ParentTaskId)
         {
             string parentTaskState = "Planned";
@@ -171,6 +238,11 @@ namespace iLoyTaskManagementSystem.Controllers
             _context.SaveChanges();
         }
 
+        /// <summary>
+        /// Returns true if tasks exists based on id.
+        /// </summary>
+        /// <param name="taskId"></param>
+        /// <returns></returns>
         public bool IsTaskExists(int? taskId)
         {
             bool isTaskExists = false;
